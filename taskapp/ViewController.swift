@@ -43,16 +43,19 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         searchBar.autocorrectionType = .no
     }
 
+    // 検索バーが更新されたとき
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 
         // 検索キーワードが空のとき
         if searchText.isEmpty {
             // レルムの全データを日付の昇順で取得
             taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)
-        // 検索キーワードが入っているとき
+        // 検索キーワードが入っている場合は、該当するカテゴリで絞る
         }else{
+            // 検索キーワードをレルム用に加工する
+            let predicate = NSPredicate(format: "category = %@", searchText)
             // レルムのデータを検索キーワードで絞り込みして日付の昇順で取得
-            taskArray = try! Realm().objects(Task.self).filter("category = '\(searchText)'").sorted(byKeyPath: "date", ascending: true)
+            taskArray = try! Realm().objects(Task.self).filter(predicate).sorted(byKeyPath: "date", ascending: true)
         }
 
         // テーブル再表示
